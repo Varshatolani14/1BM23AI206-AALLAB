@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_NODES 100
+
+typedef struct {
+    int adj[MAX_NODES][MAX_NODES];
+    int num_nodes;
+} Graph;
+
+typedef struct {
+    int items[MAX_NODES];
+    int top;
+} Stack;
+
+void initStack(Stack* s) {
+    s->top = -1;
+}
+
+void push(Stack* s, int value) {
+    s->items[++(s->top)] = value;
+}
+
+int pop(Stack* s) {
+    return s->items[(s->top)--];
+}
+
+void dfs(Graph* g, int node, int* visited, Stack* s) {
+    visited[node] = 1;
+    
+    for (int i = 0; i < g->num_nodes; i++) {
+        if (g->adj[node][i] && !visited[i]) {
+            dfs(g, i, visited, s);
+        }
+    }
+    
+    push(s, node);
+}
+
+void topologicalSort(Graph* g) {
+    Stack s;
+    initStack(&s);
+    
+    int visited[MAX_NODES] = {0};
+    
+    for (int i = 0; i < g->num_nodes; i++) {
+        if (!visited[i]) {
+            dfs(g, i, visited, &s);
+        }
+    }
+    
+    printf("Topological order: ");
+    while (s.top != -1) {
+        printf("%d ", pop(&s));
+    }
+    printf("\n");
+}
+
+int main() {
+    Graph g;
+    int num_nodes, num_edges;
+    
+    printf("Enter number of nodes: ");
+    scanf("%d", &g.num_nodes);
+    
+    printf("Enter number of edges: ");
+    scanf("%d", &num_edges);
+    
+    for (int i = 0; i < g.num_nodes; i++) {
+        for (int j = 0; j < g.num_nodes; j++) {
+            g.adj[i][j] = 0;
+        }
+    }
+    
+    printf("Enter edges (from to):\n");
+    for (int i = 0; i < num_edges; i++) {
+        int from, to;
+        scanf("%d %d", &from, &to);
+        g.adj[from][to] = 1;
+    }
+    
+    topologicalSort(&g);
+    
+    return 0;
+}
