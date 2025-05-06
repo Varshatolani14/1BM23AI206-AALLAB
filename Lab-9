@@ -1,43 +1,60 @@
-class Solution {
-public:
-    vector<vector<string>> solveNQueens(int n) {
-        vector<vector<string>> result;
-        vector<int> board(n, -1);
-        backtrack(result, board, 0, n);
-        return result;
-    }
+#include <iostream>
+#include <vector>
 
-    void backtrack(vector<vector<string>>& result, vector<int>& board, int row, int n) {
-        if (row == n) {
-            result.push_back(generateBoard(board, n));
-            return;
-        }
+using namespace std;
 
-        for (int col = 0; col < n; col++) {
-            if (isSafe(board, row, col, n)) {
-                board[row] = col;
-                backtrack(result, board, row + 1, n);
-                board[row] = -1;
+void printBoard(const vector<int>& board, int N) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (board[i] == j) {
+                cout << "Q ";
+            } else {
+                cout << ". ";
             }
         }
+        cout << endl;
     }
+    cout << endl;
+}
 
-    bool isSafe(const vector<int>& board, int row, int col, int n) {
-        for (int i = 0; i < row; i++) {
-            if (board[i] == col || abs(board[i] - col) == abs(i - row)) {
-                return false;
-            }
+bool isSafe(const vector<int>& board, int row, int col, int N) {
+    for (int i = 0; i < row; i++) {
+        if (board[i] == col || board[i] - i == col - row || board[i] + i == col + row) {
+            return false;
         }
+    }
+    return true;
+}
+
+bool solveNQueens(vector<int>& board, int row, int N) {
+    if (row == N) {
+        printBoard(board, N);
         return true;
     }
 
-    vector<string> generateBoard(const vector<int>& board, int n) {
-        vector<string> solution;
-        for (int i = 0; i < n; i++) {
-            string row(n, '.');
-            row[board[i]] = 'Q';
-            solution.push_back(row);
+    bool result = false;
+    for (int col = 0; col < N; col++) {
+        if (isSafe(board, row, col, N)) {
+            board[row] = col;
+            result = solveNQueens(board, row + 1, N) || result;
         }
-        return solution;
     }
-};
+    return result;
+}
+
+void solveNQueens(int N) {
+    vector<int> board(N, -1);
+    if (!solveNQueens(board, 0, N)) {
+        cout << "No solution exists!" << endl;
+    }
+}
+
+int main() {
+    int N;
+    cout << "Enter the number of queens: ";
+    cin >> N;
+
+    solveNQueens(N);
+
+    return 0;
+}
