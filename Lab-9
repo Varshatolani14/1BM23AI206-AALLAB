@@ -1,0 +1,43 @@
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> result;
+        vector<int> board(n, -1);
+        backtrack(result, board, 0, n);
+        return result;
+    }
+
+    void backtrack(vector<vector<string>>& result, vector<int>& board, int row, int n) {
+        if (row == n) {
+            result.push_back(generateBoard(board, n));
+            return;
+        }
+
+        for (int col = 0; col < n; col++) {
+            if (isSafe(board, row, col, n)) {
+                board[row] = col;
+                backtrack(result, board, row + 1, n);
+                board[row] = -1;
+            }
+        }
+    }
+
+    bool isSafe(const vector<int>& board, int row, int col, int n) {
+        for (int i = 0; i < row; i++) {
+            if (board[i] == col || abs(board[i] - col) == abs(i - row)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    vector<string> generateBoard(const vector<int>& board, int n) {
+        vector<string> solution;
+        for (int i = 0; i < n; i++) {
+            string row(n, '.');
+            row[board[i]] = 'Q';
+            solution.push_back(row);
+        }
+        return solution;
+    }
+};
