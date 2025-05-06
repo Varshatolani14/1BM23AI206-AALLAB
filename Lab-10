@@ -1,0 +1,56 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+
+using namespace std;
+
+int tsp(int mask, int pos, vector<vector<int>>& dist, vector<vector<int>>& dp, int N) {
+    // If all cities have been visited, return the distance to the starting city
+    if (mask == (1 << N) - 1) {
+        return dist[pos][0];
+    }
+
+    // If this subproblem has been solved before, return the result
+    if (dp[mask][pos] != -1) {
+        return dp[mask][pos];
+    }
+
+    int ans = INT_MAX;
+
+    // Try to go to every other city
+    for (int city = 0; city < N; city++) {
+        // If the city has not been visited yet
+        if ((mask & (1 << city)) == 0) {
+            int newAns = dist[pos][city] + tsp(mask | (1 << city), city, dist, dp, N);
+            ans = min(ans, newAns);
+        }
+    }
+
+    // Store and return the result of this subproblem
+    dp[mask][pos] = ans;
+    return ans;
+}
+
+int main() {
+    int N;
+    cout << "Enter the number of cities: ";
+    cin >> N;
+
+    vector<vector<int>> dist(N, vector<int>(N));
+    cout << "Enter the distance matrix: (Use 0 for same city and distance between cities)" << endl;
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cin >> dist[i][j];
+        }
+    }
+
+    // Initialize DP table with -1 (indicating not visited)
+    vector<vector<int>> dp(1 << N, vector<int>(N, -1));
+
+    // Start the TSP from city 0
+    int result = tsp(1, 0, dist, dp, N);
+
+    cout << "The shortest possible route has a length of: " << result << endl;
+
+    return 0;
+}
